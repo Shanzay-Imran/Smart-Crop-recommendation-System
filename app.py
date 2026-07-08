@@ -52,4 +52,6 @@ if st.button("🌾 Predict Crop"):
 
     prediction = model.predict(input_data)
 
-    st.success(f"Recommended Crop: {prediction[0]}")
+    crop_name = label_encoder.classes_[int(prediction[0])]
+
+    st.success(f"Recommended Crop: {crop_name}")
