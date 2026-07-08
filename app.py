@@ -2,117 +2,56 @@ import streamlit as st
 import numpy as np
 import joblib
 
-# ----------------------------
-# Page Settings
-# ----------------------------
+# Page Setup
 st.set_page_config(
-    page_title="Smart Crop Recommendation System",
+    page_title="Crop Predictor",
     page_icon="🌱",
-    layout="wide"
+    layout="centered"
 )
 
-# ----------------------------
-# Load Files
-# ----------------------------
+# Load Model
 model = joblib.load("crop_model.pkl")
 scaler = joblib.load("scaler.pkl")
 label_encoder = joblib.load("label_encoder.pkl")
 
-# ----------------------------
-# Sidebar
-# ----------------------------
-st.sidebar.title("🌱 Smart Crop Recommendation")
-st.sidebar.info(
-"""
-This application recommends the most suitable crop
-based on soil nutrients and environmental conditions.
 
-Machine Learning Model:
-✔ Random Forest
-"""
-)
+# App Title
+st.title("🌱 Smart Crop Recommendation")
+st.write("Enter soil and weather details to get the recommended crop.")
 
-# ----------------------------
-# Main Title
-# ----------------------------
-st.title("🌾 Smart Crop Recommendation System")
 
-st.write(
-"Enter the following soil and weather parameters to predict the most suitable crop."
-)
+# Input Section
 
-# ----------------------------
-# Input Fields
-# ----------------------------
 col1, col2 = st.columns(2)
 
 with col1:
-    N = st.number_input("Nitrogen (N)", min_value=0.0)
-    P = st.number_input("Phosphorus (P)", min_value=0.0)
-    K = st.number_input("Potassium (K)", min_value=0.0)
+    N = st.number_input("Nitrogen (N)", min_value=0)
+    P = st.number_input("Phosphorus (P)", min_value=0)
+    K = st.number_input("Potassium (K)", min_value=0)
     temperature = st.number_input("Temperature (°C)", value=25.0)
 
 with col2:
     humidity = st.number_input("Humidity (%)", value=80.0)
-    ph = st.number_input("pH", value=6.5)
+    ph = st.number_input("Soil pH", value=6.5)
     rainfall = st.number_input("Rainfall (mm)", value=100.0)
 
-# ----------------------------
+
 # Prediction
-# ----------------------------
-if st.button("🌱 Predict Crop"):
 
-    data = np.array([[N, P, K,
-                      temperature,
-                      humidity,
-                      ph,
-                      rainfall]])
+if st.button("🌾 Predict Crop"):
 
-    data = scaler.transform(data)
+    input_data = np.array([[
+        N, P, K,
+        temperature,
+        humidity,
+        ph,
+        rainfall
+    ]])
 
-    prediction = model.predict(data)
+    input_data = scaler.transform(input_data)
+
+    prediction = model.predict(input_data)
 
     crop = label_encoder.inverse_transform(prediction)
 
-    st.success(f"✅ Recommended Crop: **{crop[0]}**")
-
-# ----------------------------
-# Accuracy
-# ----------------------------
-st.markdown("---")
-st.subheader("📊 Model Performance")
-
-st.info("Random Forest Accuracy: **99.31%**")
-
-# ----------------------------
-# About
-# ----------------------------
-st.markdown("---")
-
-st.subheader("📖 About Project")
-
-st.write("""
-This project predicts the most suitable crop using Machine Learning.
-
-Input Features
-
-- Nitrogen
-- Phosphorus
-- Potassium
-- Temperature
-- Humidity
-- pH
-- Rainfall
-
-Algorithm Used
-
-- Random Forest Classifier
-
-Libraries
-
-- Streamlit
-- NumPy
-- Pandas
-- Scikit-learn
-- Joblib
-""")
+    st.success(f"Recommended Crop: {crop[0]}")
